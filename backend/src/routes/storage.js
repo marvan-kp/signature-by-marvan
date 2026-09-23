@@ -101,7 +101,18 @@ router.post('/backup-sync', (req, res) => {
     type: 'BACKUP'
   });
 
-  res.json({ message: 'Backup sync completed', status: 'SYNCED (100%)' });
+// Stream proxy for cloud storage objects (R2 / S3)
+router.get('/proxy/*', async (req, res) => {
+  try {
+    const key = req.params[0];
+    if (!key) return res.status(400).send('Storage key required');
+    const signedUrl = await StorageService.getSignedUrl(key, 300);
+    res.redirect(signedUrl);
+  } catch (err) {
+    console.error('Storage proxy error:', err);
+    res.status(404).send('Object not found');
+  }
 });
 
 export default router;
+
