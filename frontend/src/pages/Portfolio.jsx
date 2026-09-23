@@ -121,8 +121,12 @@ export function Portfolio() {
         ) : (
           <div
             style={{
-              columns: '1 320px',
-              columnGap: '20px'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 320px), 1fr))',
+              gap: '24px',
+              alignItems: 'start',
+              maxWidth: filteredPhotos.length === 1 ? '540px' : filteredPhotos.length === 2 ? '900px' : '100%',
+              margin: filteredPhotos.length <= 2 ? '0 auto' : '0'
             }}
           >
             {filteredPhotos.map((photo) => (

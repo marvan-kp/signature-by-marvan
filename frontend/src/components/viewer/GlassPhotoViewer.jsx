@@ -132,11 +132,14 @@ export function GlassPhotoViewer({
     setTimeout(() => setCopyFeedback(false), 2000);
   };
 
-  const handleDirectDownload = () => {
+  const handleDirectDownload = (quality = 'original') => {
+    // Direct stream endpoint that preserves the exact original extension and full uncompressed quality
+    const downloadUrl = `/api/downloads/photo/${photo.id}?quality=${quality}`;
+    const filename = photo.originalFilename || `${(photo.title || 'photo').replace(/\s+/g, '_')}.jpg`;
+    
     const link = document.createElement('a');
-    link.href = photo.originalUrl || photo.webUrl || photo.url;
-    link.download = `Signature_By_Marvan_${(photo.title || 'photo').replace(/\s+/g, '_')}.webp`;
-    link.target = '_blank';
+    link.href = downloadUrl;
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

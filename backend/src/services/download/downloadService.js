@@ -84,20 +84,29 @@ Web: https://signaturebymarvan.com
     let count = 0;
     for (const photo of photos) {
       count++;
-      // Determine file source
-      const photoName = `${String(count).padStart(3, '0')}_${(photo.title || 'Photo').replace(/\s+/g, '_')}.webp`;
+      // Determine file source and original extension
+      const originalExt = path.extname(photo.originalFilename || '') || '.jpg';
+      const cleanTitle = (photo.originalFilename || photo.title || `Photo_${count}`)
+        .replace(/\.[^/.]+$/, '')
+        .replace(/\s+/g, '_');
+      const fileExt = quality === 'original' ? originalExt : '.webp';
+      const photoName = `${String(count).padStart(3, '0')}_${cleanTitle}${fileExt}`;
       
+      const targetKey = (quality === 'original' && photo.originalKey)
+        ? photo.originalKey
+        : (photo.storageKey || photo.originalKey);
+
       // If photo has a local disk file
-      if (photo.storageKey) {
-        const localPath = path.resolve(__dirname, '../../../uploads', photo.storageKey.replace(/^\/uploads\//, ''));
+      if (targetKey) {
+        const localPath = path.resolve(__dirname, '../../../uploads', targetKey.replace(/^\/uploads\//, ''));
         if (fs.existsSync(localPath)) {
           archive.file(localPath, { name: photoName });
         } else {
-          // If remote mock URL, add a descriptive bookmark/file
-          archive.append(`Direct Cloud Asset: ${photo.webUrl || photo.url}`, { name: `${photoName}.txt` });
+          // If remote cloud asset URL
+          archive.append(`Cloud Asset (${quality.toUpperCase()}): ${photo.originalUrl || photo.webUrl || photo.url}`, { name: `${photoName}.txt` });
         }
       } else {
-        archive.append(`Cloud Asset: ${photo.webUrl || photo.url}`, { name: `${photoName}.txt` });
+        archive.append(`Cloud Asset (${quality.toUpperCase()}): ${photo.originalUrl || photo.webUrl || photo.url}`, { name: `${photoName}.txt` });
       }
 
       // Update progress

@@ -41,17 +41,20 @@ export function GlassPhotoCard({
     >
       {/* Photo Image */}
       <img
-        src={photo.thumbnailUrl || photo.url}
+        src={photo.webUrl || photo.url || photo.thumbnailUrl}
         alt={photo.title || 'Wedding Photograph'}
         loading="lazy"
         onLoad={() => setLoaded(true)}
         style={{
           width: '100%',
           height: 'auto',
+          maxHeight: '75vh',
+          objectFit: 'contain',
           display: 'block',
+          background: 'rgba(5, 5, 5, 0.4)',
           filter: loaded ? 'none' : 'blur(10px)',
           transition: 'filter 0.5s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-          transform: hovered ? 'scale(1.025)' : 'scale(1.0)'
+          transform: hovered ? 'scale(1.02)' : 'scale(1.0)'
         }}
       />
 
@@ -112,27 +115,61 @@ export function GlassPhotoCard({
           <Check size={16} strokeWidth={isSelected ? 3 : 2} />
         </button>
 
-        {/* Favorite Heart Button */}
-        <button
-          onClick={() => onToggleFavorite && onToggleFavorite(photo)}
-          title={isFavorited ? 'Favorited' : 'Add to favorites'}
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: isFavorited ? 'rgba(235, 77, 75, 0.85)' : 'rgba(10, 10, 12, 0.7)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#fff',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease'
-          }}
-        >
-          <Heart size={16} fill={isFavorited ? '#fff' : 'none'} />
-        </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {/* Direct Full Quality Download */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const downloadUrl = `/api/downloads/photo/${photo.id}?quality=original`;
+              const filename = photo.originalFilename || `${(photo.title || 'photo').replace(/\s+/g, '_')}.jpg`;
+              const link = document.createElement('a');
+              link.href = downloadUrl;
+              link.setAttribute('download', filename);
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
+            title="Download full quality original photo"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: 'rgba(10, 10, 12, 0.7)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Download size={15} />
+          </button>
+
+          {/* Favorite Heart Button */}
+          <button
+            onClick={() => onToggleFavorite && onToggleFavorite(photo)}
+            title={isFavorited ? 'Favorited' : 'Add to favorites'}
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              background: isFavorited ? 'rgba(235, 77, 75, 0.85)' : 'rgba(10, 10, 12, 0.7)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <Heart size={16} fill={isFavorited ? '#fff' : 'none'} />
+          </button>
+        </div>
       </div>
 
       {/* Bottom Liquid Glass Info Bar on Hover */}

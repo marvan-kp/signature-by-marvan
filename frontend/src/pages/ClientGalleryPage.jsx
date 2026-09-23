@@ -41,6 +41,7 @@ export function ClientGalleryPage() {
   const [favorites, setFavorites] = useState([]);
   const [selection, setSelection] = useState(null);
   const [videos, setVideos] = useState([]);
+  const [gridDensity, setGridDensity] = useState('standard'); // 'compact' | 'standard' | 'large'
 
   // Modals
   const [viewerPhoto, setViewerPhoto] = useState(null);
@@ -445,45 +446,99 @@ export function ClientGalleryPage() {
         {/* PHOTO GRID (For GALLERY, FAVORITES, and SELECTIONS) */}
         {activeTab !== 'ALBUMS' && activeTab !== 'VIDEOS' && (
           <div>
-            {/* Album Sub-Filter if on main gallery tab */}
-            {activeTab === 'GALLERY' && (
-              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '16px', marginBottom: '24px' }}>
-                <button
-                  onClick={() => setSelectedAlbumId('all')}
-                  style={{
-                    padding: '6px 14px',
-                    borderRadius: '20px',
-                    background: selectedAlbumId === 'all' ? 'rgba(255,255,255,0.15)' : 'transparent',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: selectedAlbumId === 'all' ? '#fff' : 'var(--text-muted)',
-                    fontSize: '0.78rem',
-                    cursor: 'pointer'
-                  }}
-                >
-                  All Albums
-                </button>
-                {albums.map((alb) => (
+            {/* Filter and Card Size Control Bar */}
+            <div
+              style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '14px',
+                marginBottom: '24px',
+                paddingBottom: '8px'
+              }}
+            >
+              {/* Album Sub-Filter if on main gallery tab */}
+              {activeTab === 'GALLERY' ? (
+                <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
                   <button
-                    key={alb.id}
-                    onClick={() => setSelectedAlbumId(alb.id)}
+                    onClick={() => setSelectedAlbumId('all')}
                     style={{
                       padding: '6px 14px',
                       borderRadius: '20px',
-                      background: selectedAlbumId === alb.id ? 'rgba(201, 168, 106, 0.2)' : 'transparent',
-                      border: selectedAlbumId === alb.id ? '1px solid var(--gold-champagne)' : '1px solid rgba(255,255,255,0.1)',
-                      color: selectedAlbumId === alb.id ? 'var(--gold-soft)' : 'var(--text-muted)',
+                      background: selectedAlbumId === 'all' ? 'rgba(255,255,255,0.15)' : 'transparent',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      color: selectedAlbumId === 'all' ? '#fff' : 'var(--text-muted)',
                       fontSize: '0.78rem',
-                      cursor: 'pointer',
-                      whiteSpace: 'nowrap'
+                      cursor: 'pointer'
                     }}
                   >
-                    {alb.title} ({alb.photoCount})
+                    All Albums
+                  </button>
+                  {albums.map((alb) => (
+                    <button
+                      key={alb.id}
+                      onClick={() => setSelectedAlbumId(alb.id)}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        background: selectedAlbumId === alb.id ? 'rgba(201, 168, 106, 0.2)' : 'transparent',
+                        border: selectedAlbumId === alb.id ? '1px solid var(--gold-champagne)' : '1px solid rgba(255,255,255,0.1)',
+                        color: selectedAlbumId === alb.id ? 'var(--gold-soft)' : 'var(--text-muted)',
+                        fontSize: '0.78rem',
+                        cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {alb.title} ({alb.photoCount})
+                    </button>
+                  ))}
+                </div>
+              ) : <div />}
+
+              {/* Card Size Density Switcher */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: 'rgba(255,255,255,0.04)',
+                  padding: '4px 6px',
+                  borderRadius: '14px',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  marginLeft: 'auto'
+                }}
+              >
+                <span style={{ fontSize: '0.68rem', letterSpacing: '0.08em', color: 'var(--text-muted)', padding: '0 6px', textTransform: 'uppercase' }}>
+                  Card Size:
+                </span>
+                {[
+                  { id: 'compact', label: 'Compact' },
+                  { id: 'standard', label: 'Medium' },
+                  { id: 'large', label: 'Large' }
+                ].map(size => (
+                  <button
+                    key={size.id}
+                    onClick={() => setGridDensity(size.id)}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      background: gridDensity === size.id ? 'var(--gold-champagne)' : 'transparent',
+                      color: gridDensity === size.id ? '#000' : 'var(--text-secondary)',
+                      border: 'none',
+                      fontSize: '0.74rem',
+                      fontWeight: gridDensity === size.id ? 600 : 400,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {size.label}
                   </button>
                 ))}
               </div>
-            )}
+            </div>
 
-            {/* Photos Masonry Display */}
+            {/* Photos Grid Display */}
             {displayPhotos.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-muted)' }}>
                 No photographs in this collection.
@@ -491,8 +546,16 @@ export function ClientGalleryPage() {
             ) : (
               <div
                 style={{
-                  columns: '1 320px',
-                  columnGap: '20px'
+                  display: 'grid',
+                  gridTemplateColumns: gridDensity === 'large'
+                    ? 'repeat(auto-fill, minmax(min(100%, 380px), 1fr))'
+                    : gridDensity === 'compact'
+                    ? 'repeat(auto-fill, minmax(min(100%, 240px), 1fr))'
+                    : 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+                  gap: '24px',
+                  alignItems: 'start',
+                  maxWidth: displayPhotos.length === 1 ? '540px' : displayPhotos.length === 2 ? '900px' : '100%',
+                  margin: displayPhotos.length <= 2 ? '0 auto' : '0'
                 }}
               >
                 {displayPhotos.map((photo) => (
