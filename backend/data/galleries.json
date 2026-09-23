@@ -1,0 +1,57 @@
+[
+  {
+    "id": "doc_1790177330067_mjv7fcu",
+    "createdAt": "2026-09-23T15:28:50.067Z",
+    "updatedAt": "2026-09-23T15:29:39.840Z",
+    "title": "me and she",
+    "subtitle": "me and she • Wedding Gallery",
+    "slug": "me-and-she-wlqh",
+    "galleryCode": "88V17P",
+    "pin": "2030",
+    "eventDate": "2030-03-15",
+    "location": "Kannur, Kerala",
+    "venue": "Destination Wedding Venue",
+    "status": "ACTIVE",
+    "expiryDate": "2027-03-22",
+    "totalPhotos": 5,
+    "photoCountDisplay": 5,
+    "favoritesCount": 0,
+    "downloadCount": 0,
+    "selectionLimit": 100,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww",
+    "watermarkSettings": {
+      "enabled": true,
+      "type": "text",
+      "text": "SIGNATURE BY MARVAN",
+      "position": "bottom-right",
+      "opacity": 0.22,
+      "size": "medium"
+    },
+    "storyChapters": [
+      {
+        "title": "THE BEGINNING",
+        "description": "Quiet dawn preparations and heirloom silks."
+      },
+      {
+        "title": "THE CEREMONY",
+        "description": "Sacred vows and timeless rituals."
+      },
+      {
+        "title": "THE MOMENTS",
+        "description": "Stolen glances and heartfelt tears."
+      },
+      {
+        "title": "THE DETAILS",
+        "description": "Handcrafted floral art and jewelry."
+      },
+      {
+        "title": "THE CELEBRATION",
+        "description": "Music, laughter, and high energy."
+      },
+      {
+        "title": "FOREVER",
+        "description": "The journey together begins."
+      }
+    ]
+  }
+]

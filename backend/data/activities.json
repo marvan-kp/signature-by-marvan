@@ -1,0 +1,23 @@
+[
+  {
+    "text": "Studio reset to Clean Live Production mode. Ready for real weddings and uploads.",
+    "time": "Just now",
+    "type": "SYSTEM"
+  },
+  {
+    "id": "doc_1790177330072_qxsuqhc",
+    "createdAt": "2026-09-23T15:28:50.072Z",
+    "updatedAt": "2026-09-23T15:28:50.072Z",
+    "text": "Created new wedding gallery: me and she",
+    "time": "Just now",
+    "type": "GALLERY_CREATE"
+  },
+  {
+    "id": "doc_1790177379841_kwwwqcd",
+    "createdAt": "2026-09-23T15:29:39.841Z",
+    "updatedAt": "2026-09-23T15:29:39.841Z",
+    "text": "Uploaded 5 new photographs to me and she",
+    "time": "Just now",
+    "type": "UPLOAD"
+  }
+]

@@ -1,0 +1,14 @@
+[
+  {
+    "id": "storage_summary_active",
+    "createdAt": "2026-09-23T14:24:30.839Z",
+    "updatedAt": "2026-09-23T15:29:39.483Z",
+    "usedBytes": 23981021,
+    "limitBytes": 10737418240,
+    "freeTierProvider": "Cloudflare R2 Free Tier",
+    "totalFiles": 15,
+    "primaryStorageStatus": "HEALTHY",
+    "backupStorageStatus": "SYNCED (100%)",
+    "lastBackupDate": "2026-09-23T14:46:56.814Z"
+  }
+]

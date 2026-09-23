@@ -1,0 +1,157 @@
+[
+  {
+    "id": "doc_1790177372704_kk6dlhh",
+    "createdAt": "2026-09-23T15:29:32.704Z",
+    "updatedAt": "2026-09-23T15:29:32.704Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "albumId": "alb_ceremony",
+    "category": "Weddings",
+    "title": "DSC 0008",
+    "originalFilename": "DSC_0008.JPG",
+    "fileHash": "1c5cb4da1571ade6838e01b0bdfd102b",
+    "aspectRatio": "3:2",
+    "url": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177370761_eh5yts_web.webp",
+    "webUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177370761_eh5yts_web.webp",
+    "thumbnailUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177370761_eh5yts_thumb.webp",
+    "originalUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177370761_eh5yts_orig.JPG",
+    "storageKey": "galleries/doc_1790177330067_mjv7fcu/1790177370761_eh5yts_web.webp",
+    "dimensions": {
+      "width": 4608,
+      "height": 3072
+    },
+    "fileSize": 5083229,
+    "blurScore": 0.67,
+    "aiQualityScore": 7.5,
+    "tags": [
+      "Weddings",
+      "Upload",
+      "3:2"
+    ],
+    "favorited": false,
+    "selected": false
+  },
+  {
+    "id": "doc_1790177374406_4gecaji",
+    "createdAt": "2026-09-23T15:29:34.406Z",
+    "updatedAt": "2026-09-23T15:29:34.406Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "albumId": "alb_ceremony",
+    "category": "Weddings",
+    "title": "DSC 0011",
+    "originalFilename": "DSC_0011.JPG",
+    "fileHash": "23e6be2bed37e822802d23748322ec69",
+    "aspectRatio": "3:2",
+    "url": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177372717_ngx0i4_web.webp",
+    "webUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177372717_ngx0i4_web.webp",
+    "thumbnailUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177372717_ngx0i4_thumb.webp",
+    "originalUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177372717_ngx0i4_orig.JPG",
+    "storageKey": "galleries/doc_1790177330067_mjv7fcu/1790177372717_ngx0i4_web.webp",
+    "dimensions": {
+      "width": 4608,
+      "height": 3072
+    },
+    "fileSize": 4350183,
+    "blurScore": 0.86,
+    "aiQualityScore": 8.6,
+    "tags": [
+      "Weddings",
+      "Upload",
+      "3:2"
+    ],
+    "favorited": false,
+    "selected": false
+  },
+  {
+    "id": "doc_1790177376318_3kb4uq2",
+    "createdAt": "2026-09-23T15:29:36.318Z",
+    "updatedAt": "2026-09-23T15:29:36.318Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "albumId": "alb_ceremony",
+    "category": "Weddings",
+    "title": "DSC 0014",
+    "originalFilename": "DSC_0014.JPG",
+    "fileHash": "18960ef7a406867fc55d9c0d8b402142",
+    "aspectRatio": "3:2",
+    "url": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177374426_iyly8m_web.webp",
+    "webUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177374426_iyly8m_web.webp",
+    "thumbnailUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177374426_iyly8m_thumb.webp",
+    "originalUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177374426_iyly8m_orig.JPG",
+    "storageKey": "galleries/doc_1790177330067_mjv7fcu/1790177374426_iyly8m_web.webp",
+    "dimensions": {
+      "width": 4608,
+      "height": 3072
+    },
+    "fileSize": 4548362,
+    "blurScore": 0.82,
+    "aiQualityScore": 8.2,
+    "tags": [
+      "Weddings",
+      "Upload",
+      "3:2"
+    ],
+    "favorited": false,
+    "selected": false
+  },
+  {
+    "id": "doc_1790177378192_vd657p2",
+    "createdAt": "2026-09-23T15:29:38.192Z",
+    "updatedAt": "2026-09-23T15:29:38.192Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "albumId": "alb_ceremony",
+    "category": "Weddings",
+    "title": "DSC 0015",
+    "originalFilename": "DSC_0015.JPG",
+    "fileHash": "1e895eb344b34d187021f459def78bf3",
+    "aspectRatio": "3:2",
+    "url": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177376338_lswjbi_web.webp",
+    "webUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177376338_lswjbi_web.webp",
+    "thumbnailUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177376338_lswjbi_thumb.webp",
+    "originalUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177376338_lswjbi_orig.JPG",
+    "storageKey": "galleries/doc_1790177330067_mjv7fcu/1790177376338_lswjbi_web.webp",
+    "dimensions": {
+      "width": 4608,
+      "height": 3072
+    },
+    "fileSize": 4403662,
+    "blurScore": 0.73,
+    "aiQualityScore": 7.5,
+    "tags": [
+      "Weddings",
+      "Upload",
+      "3:2"
+    ],
+    "favorited": false,
+    "selected": false
+  },
+  {
+    "id": "doc_1790177379838_9hpe0ho",
+    "createdAt": "2026-09-23T15:29:39.838Z",
+    "updatedAt": "2026-09-23T15:29:39.838Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "albumId": "alb_ceremony",
+    "category": "Weddings",
+    "title": "DSC 0016",
+    "originalFilename": "DSC_0016.JPG",
+    "fileHash": "e139db66c504c179f77660bd4dfdc507",
+    "aspectRatio": "3:2",
+    "url": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177378208_7pbm9d_web.webp",
+    "webUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177378208_7pbm9d_web.webp",
+    "thumbnailUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177378208_7pbm9d_thumb.webp",
+    "originalUrl": "/uploads/galleries/doc_1790177330067_mjv7fcu/1790177378208_7pbm9d_orig.JPG",
+    "storageKey": "galleries/doc_1790177330067_mjv7fcu/1790177378208_7pbm9d_web.webp",
+    "dimensions": {
+      "width": 4608,
+      "height": 3072
+    },
+    "fileSize": 4568985,
+    "blurScore": 0.73,
+    "aiQualityScore": 7.5,
+    "tags": [
+      "Weddings",
+      "Upload",
+      "3:2"
+    ],
+    "favorited": false,
+    "selected": false
+  }
+]

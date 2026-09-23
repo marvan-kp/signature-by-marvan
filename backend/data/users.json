@@ -1,0 +1,25 @@
+[
+  {
+    "id": "usr_marvan_01",
+    "createdAt": "2026-09-23T14:24:30.803Z",
+    "updatedAt": "2026-09-23T14:24:30.804Z",
+    "name": "Marvan K.P.",
+    "email": "marvan@signaturebymarvan.com",
+    "passwordHash": "signature2026",
+    "role": "OWNER",
+    "bio": "Principal Photographer & Visual Artist. Crafting emotional, cinematic wedding stories across Kerala and beyond.",
+    "avatar": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+    "phone": "+91 98765 43210"
+  },
+  {
+    "id": "usr_editor_01",
+    "createdAt": "2026-09-23T14:24:30.804Z",
+    "updatedAt": "2026-09-23T14:24:30.804Z",
+    "name": "Aiswarya Mohan",
+    "email": "aiswarya@signaturebymarvan.com",
+    "passwordHash": "editor2026",
+    "role": "EDITOR",
+    "bio": "Senior Colorist & Retoucher.",
+    "phone": "+91 98765 43211"
+  }
+]

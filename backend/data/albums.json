@@ -1,0 +1,65 @@
+[
+  {
+    "id": "doc_1790177330068_1n0cdau",
+    "createdAt": "2026-09-23T15:28:50.068Z",
+    "updatedAt": "2026-09-23T15:28:50.068Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "title": "Ceremony",
+    "photoCount": 0,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww"
+  },
+  {
+    "id": "doc_1790177330068_0jkebyu",
+    "createdAt": "2026-09-23T15:28:50.068Z",
+    "updatedAt": "2026-09-23T15:28:50.068Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "title": "Reception",
+    "photoCount": 0,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww"
+  },
+  {
+    "id": "doc_1790177330068_9xynpes",
+    "createdAt": "2026-09-23T15:28:50.068Z",
+    "updatedAt": "2026-09-23T15:28:50.068Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "title": "Bride",
+    "photoCount": 0,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww"
+  },
+  {
+    "id": "doc_1790177330069_wdkzajt",
+    "createdAt": "2026-09-23T15:28:50.069Z",
+    "updatedAt": "2026-09-23T15:28:50.069Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "title": "Groom",
+    "photoCount": 0,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww"
+  },
+  {
+    "id": "doc_1790177330069_x7aiuow",
+    "createdAt": "2026-09-23T15:28:50.069Z",
+    "updatedAt": "2026-09-23T15:28:50.069Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "title": "Couple",
+    "photoCount": 0,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww"
+  },
+  {
+    "id": "doc_1790177330070_rv22r9g",
+    "createdAt": "2026-09-23T15:28:50.070Z",
+    "updatedAt": "2026-09-23T15:28:50.070Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "title": "Family",
+    "photoCount": 0,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww"
+  },
+  {
+    "id": "doc_1790177330071_rxzogxv",
+    "createdAt": "2026-09-23T15:28:50.071Z",
+    "updatedAt": "2026-09-23T15:28:50.071Z",
+    "galleryId": "doc_1790177330067_mjv7fcu",
+    "title": "Details",
+    "photoCount": 0,
+    "coverImage": "https://images.unsplash.com/photo-1506014299253-3725319c0f69?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8Y291cGxlfGVufDB8fDB8fHww"
+  }
+]
