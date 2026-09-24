@@ -61,6 +61,13 @@ class ApiService {
     return this.request('/auth/me');
   }
 
+  changePassword(currentPassword, newPassword, email) {
+    return this.request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword, email })
+    });
+  }
+
   // Galleries
   getGalleries() {
     return this.request('/galleries');

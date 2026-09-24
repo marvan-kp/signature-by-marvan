@@ -25,7 +25,9 @@ import {
   UserPlus,
   RefreshCcw,
   Mail,
-  Phone
+  Phone,
+  KeyRound,
+  Lock
 } from 'lucide-react';
 import { GlassNavbar } from '../components/glass/GlassNavbar';
 import { GlassCard, GlassStatCard, GlassButton } from '../components/glass/GlassCard';
@@ -64,6 +66,12 @@ export function AdminDashboard() {
   const [photographerNotes, setPhotographerNotes] = useState('');
   const [actionMessage, setActionMessage] = useState('');
   const [uploadingCover, setUploadingCover] = useState(false);
+
+  // Security Credentials Modal
+  const [securityModal, setSecurityModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   // New Gallery Form
   const [newGalleryData, setNewGalleryData] = useState({
@@ -288,6 +296,30 @@ export function AdminDashboard() {
     }
   };
 
+  const handleUpdatePassword = async (e) => {
+    e.preventDefault();
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters');
+      return;
+    }
+    setPasswordError('');
+    try {
+      await api.changePassword(passwordForm.currentPassword, passwordForm.newPassword, user?.email);
+      setPasswordSuccess('Studio fixed password updated successfully!');
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setTimeout(() => {
+        setPasswordSuccess('');
+        setSecurityModal(false);
+      }, 2000);
+    } catch (err) {
+      setPasswordError(err.message || 'Failed to update password');
+    }
+  };
+
   const stages = [
     { key: 'BOOKED', label: 'Booked' },
     { key: 'SHOOT_COMPLETED', label: 'Shoot Done' },
@@ -351,6 +383,25 @@ export function AdminDashboard() {
             >
               CLEAR DEMO DATA
             </GlassButton>
+
+            <button
+              onClick={() => setSecurityModal(true)}
+              title="Studio Security & Password"
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '50%',
+                background: 'rgba(255, 255, 255, 0.06)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                color: 'var(--gold-soft)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <KeyRound size={16} />
+            </button>
 
             <button
               onClick={() => { logout(); navigate('/admin/login'); }}
@@ -1419,6 +1470,81 @@ export function AdminDashboard() {
             </div>
           </div>
         )}
+      </GlassModal>
+
+      {/* Studio Security & Change Password Modal */}
+      <GlassModal
+        isOpen={securityModal}
+        onClose={() => { setSecurityModal(false); setPasswordError(''); setPasswordSuccess(''); }}
+        title="Studio Security Credentials"
+      >
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ fontSize: '0.78rem', color: 'var(--gold-soft)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '4px' }}>
+            Fixed Studio Email
+          </div>
+          <div style={{ padding: '10px 14px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', fontSize: '0.9rem', fontWeight: 500 }}>
+            {user?.email || 'marvankp847@gmail.com'}
+          </div>
+        </div>
+
+        <form onSubmit={handleUpdatePassword} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {passwordError && (
+            <div style={{ padding: '10px 14px', borderRadius: '10px', background: 'rgba(245, 108, 108, 0.15)', border: '1px solid rgba(245, 108, 108, 0.3)', color: '#F56C6C', fontSize: '0.8rem' }}>
+              {passwordError}
+            </div>
+          )}
+          {passwordSuccess && (
+            <div style={{ padding: '10px 14px', borderRadius: '10px', background: 'rgba(103, 194, 58, 0.15)', border: '1px solid rgba(103, 194, 58, 0.3)', color: '#67C23A', fontSize: '0.8rem' }}>
+              {passwordSuccess}
+            </div>
+          )}
+
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Current Password
+            </label>
+            <input
+              type="password"
+              required
+              placeholder="Enter current password"
+              className="glass-input"
+              value={passwordForm.currentPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              New Fixed Password
+            </label>
+            <input
+              type="password"
+              required
+              placeholder="Enter at least 6 characters"
+              className="glass-input"
+              value={passwordForm.newPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              required
+              placeholder="Re-enter new password"
+              className="glass-input"
+              value={passwordForm.confirmPassword}
+              onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+            />
+          </div>
+
+          <GlassButton type="submit" variant="gold" style={{ marginTop: '10px' }} icon={Lock}>
+            UPDATE STUDIO PASSWORD
+          </GlassButton>
+        </form>
       </GlassModal>
     </div>
   );

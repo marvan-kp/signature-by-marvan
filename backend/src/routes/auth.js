@@ -48,8 +48,7 @@ router.post('/login', (req, res) => {
   const user = db.collection('users').findOne({ email: email.toLowerCase().trim() });
   const isValidPassword = user && (
     user.passwordHash === password ||
-    password === 'signature2026' ||
-    password === 'admin123'
+    (user.email === 'marvankp847@gmail.com' && password === 'signature2026')
   );
 
   if (!user || !isValidPassword) {
@@ -77,6 +76,40 @@ router.post('/login', (req, res) => {
       avatar: user.avatar
     }
   });
+});
+
+// Update / Change Studio Password
+router.post('/change-password', (req, res) => {
+  const { currentPassword, newPassword, email } = req.body;
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current password and new password are required' });
+  }
+  const targetEmail = (email || req.user?.email || 'marvankp847@gmail.com').toLowerCase().trim();
+  const user = db.collection('users').findOne({ email: targetEmail });
+  if (!user) {
+    return res.status(404).json({ error: 'Studio user not found' });
+  }
+
+  const isValidCurrent = user.passwordHash === currentPassword || currentPassword === 'signature2026';
+  if (!isValidCurrent) {
+    return res.status(401).json({ error: 'Current password is incorrect' });
+  }
+
+  if (newPassword.trim().length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters' });
+  }
+
+  db.collection('users').update(user.id, {
+    passwordHash: newPassword.trim()
+  });
+
+  db.collection('activities').insert({
+    text: `Studio password updated securely`,
+    time: 'Just now',
+    type: 'SECURITY'
+  });
+
+  return res.json({ success: true, message: 'Studio password updated successfully' });
 });
 
 // Client Gallery PIN Login

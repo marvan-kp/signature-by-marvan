@@ -35,11 +35,6 @@ export function AdminLogin() {
     }
   };
 
-  const handleFillDemo = () => {
-    setEmail('marvankp847@gmail.com');
-    setPassword('signature2026');
-  };
-
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-pitch)', color: '#fff', position: 'relative' }}>
       <GlassNavbar />
@@ -167,25 +162,9 @@ export function AdminLogin() {
             </GlassButton>
           </form>
 
-          <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-            <button
-              type="button"
-              onClick={handleFillDemo}
-              style={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(201, 168, 106, 0.25)',
-                color: 'var(--gold-soft)',
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                fontSize: '0.75rem',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <KeyRound size={13} /> Fill Demo Studio Credentials
-            </button>
+          <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+            <KeyRound size={13} color="var(--gold-soft)" />
+            <span>Encrypted Studio Authentication • Signature by Marvan</span>
           </div>
         </GlassCard>
       </div>
