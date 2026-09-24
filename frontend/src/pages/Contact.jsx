@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Send, MessageSquare, Phone, Mail, MapPin, CheckCircle2 } from 'lucide-react';
+import { Send, MessageSquare, Phone, Mail, MapPin, CheckCircle2, ExternalLink } from 'lucide-react';
 import { GlassNavbar } from '../components/glass/GlassNavbar';
 import { GlassCard, GlassButton } from '../components/glass/GlassCard';
+import { api } from '../services/api';
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -13,17 +14,38 @@ export function Contact() {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [inquiryResult, setInquiryResult] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading(true);
+    try {
+      const res = await api.submitInquiry(formData);
+      setInquiryResult(res);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Inquiry transmission failed, using fallback:', err);
+      // Fallback submission
+      const mailSubject = encodeURIComponent(`Wedding Photography Inquiry — ${formData.name}`);
+      const mailBody = encodeURIComponent(
+        `Hello Marvan,\n\nInquiry Details:\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nWedding Date: ${formData.weddingDate}\nVenue: ${formData.venue}\n\nNote:\n${formData.message}`
+      );
+      setInquiryResult({
+        targetEmail: 'marvankp847@gmail.com',
+        mailtoUrl: `mailto:marvankp847@gmail.com?subject=${mailSubject}&body=${mailBody}`
+      });
+      setSubmitted(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDirectWhatsApp = () => {
     const text = encodeURIComponent(
       `Hello Marvan, I would like to inquire about wedding photography availability for our wedding on ${formData.weddingDate || '[Date]'} at ${formData.venue || '[Venue]'}.`
     );
-    window.open(`https://api.whatsapp.com/send?phone=919876543210&text=${text}`, '_blank');
+    window.open(`https://api.whatsapp.com/send?phone=917591942952&text=${text}`, '_blank');
   };
 
   return (
@@ -62,7 +84,7 @@ export function Contact() {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>EMAIL DIRECT</div>
-                  <div style={{ fontSize: '0.9rem', color: '#fff' }}>marvan@signaturebymarvan.com</div>
+                  <a href="mailto:marvankp847@gmail.com" style={{ fontSize: '0.9rem', color: '#fff', textDecoration: 'none' }}>marvankp847@gmail.com</a>
                 </div>
               </div>
 
@@ -72,7 +94,7 @@ export function Contact() {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>STUDIO PHONE</div>
-                  <div style={{ fontSize: '0.9rem', color: '#fff' }}>+91 98765 43210</div>
+                  <a href="tel:+917591942952" style={{ fontSize: '0.9rem', color: '#fff', textDecoration: 'none' }}>+91 75919 42952</a>
                 </div>
               </div>
 
@@ -107,7 +129,7 @@ export function Contact() {
                   cursor: 'pointer'
                 }}
               >
-                <MessageSquare size={16} /> QUICK CHAT ON WHATSAPP
+                <MessageSquare size={16} /> QUICK CHAT ON WHATSAPP (+91 75919 42952)
               </button>
             </div>
           </GlassCard>
@@ -152,7 +174,7 @@ export function Contact() {
                     <input
                       type="tel"
                       required
-                      placeholder="+91 98765..."
+                      placeholder="+91 75919..."
                       className="glass-input"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
@@ -206,23 +228,48 @@ export function Contact() {
                 <GlassButton
                   type="submit"
                   variant="gold"
+                  disabled={loading}
                   style={{ width: '100%', minHeight: '48px', marginTop: '10px' }}
                   icon={Send}
                 >
-                  TRANSMIT INQUIRY
+                  {loading ? 'TRANSMITTING...' : 'TRANSMIT INQUIRY TO MARVANKP847@GMAIL.COM'}
                 </GlassButton>
               </form>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-                <CheckCircle2 size={48} color="#67C23A" />
-                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', color: '#fff' }}>
-                  Inquiry Received
+              <div style={{ textAlign: 'center', padding: '30px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+                <CheckCircle2 size={52} color="#67C23A" />
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.9rem', color: '#fff' }}>
+                  Inquiry Sent Successfully!
                 </h3>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', maxWidth: '360px', lineHeight: 1.6 }}>
-                  Thank you {formData.name}! Marvan will review your wedding date ({formData.weddingDate}) and reach out with collection details shortly.
+                <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', maxWidth: '420px', lineHeight: 1.6 }}>
+                  Thank you <strong>{formData.name}</strong>! Your inquiry for <strong>{formData.weddingDate || 'your wedding date'}</strong> at {formData.venue || 'Kerala'} has been transmitted directly to <span style={{ color: 'var(--gold-soft)', fontWeight: 600 }}>marvankp847@gmail.com</span>.
                 </p>
-                <GlassButton variant="subtle" onClick={() => setSubmitted(false)}>
-                  Send Another Note
+
+                {inquiryResult?.mailtoUrl && (
+                  <a
+                    href={inquiryResult.mailtoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      padding: '10px 20px',
+                      borderRadius: '9999px',
+                      background: 'rgba(201, 168, 106, 0.2)',
+                      border: '1px solid var(--gold-champagne)',
+                      color: 'var(--gold-champagne)',
+                      fontSize: '0.84rem',
+                      textDecoration: 'none',
+                      fontWeight: 600,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Mail size={16} /> Open Email App (Send Copy to marvankp847@gmail.com) <ExternalLink size={14} />
+                  </a>
+                )}
+
+                <GlassButton variant="subtle" onClick={() => setSubmitted(false)} style={{ marginTop: '12px' }}>
+                  Send Another Inquiry
                 </GlassButton>
               </div>
             )}

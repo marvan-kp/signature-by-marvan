@@ -95,20 +95,23 @@ export class CloudflareR2StorageProvider {
 
   getStorageUsage() {
     const storageSummary = db.collection('storageObjects').findOne({ id: 'storage_summary_active' });
-    const limit = 10 * 1024 * 1024 * 1024; // 10 GB free on Cloudflare R2
+    const limit = (storageSummary && storageSummary.limitBytes) ? storageSummary.limitBytes : 10 * 1024 * 1024 * 1024; // 10 GB free on Cloudflare R2
     const used = storageSummary ? storageSummary.usedBytes : 0;
     const percentage = Math.min(100, Math.round((used / limit) * 100));
+    const usedMb = used / (1024 * 1024);
+    const usedGb = used / (1024 * 1024 * 1024);
+    const usedFormatted = usedGb >= 1 ? `${usedGb.toFixed(2)} GB` : `${usedMb.toFixed(1)} MB`;
 
     return {
       usedBytes: used,
-      usedFormatted: (used / (1024 * 1024 * 1024)).toFixed(1) + ' GB',
+      usedFormatted,
       limitBytes: limit,
-      limitFormatted: '10 GB (Free)',
+      limitFormatted: `${Math.round(limit / (1024 * 1024 * 1024))} GB (Free)`,
       percentage,
       warningLevel: percentage > 90 ? 'WARNING' : 'NORMAL',
       warningMessage: 'Cloudflare R2 active: 10 GB free cloud storage with $0 egress bandwidth.',
       provider: 'Cloudflare R2 Cloud Object Storage',
-      totalFiles: storageSummary?.totalFiles || 0,
+      totalFiles: db.collection('photos').count(),
       backupStatus: 'SYNCED (100%)',
       lastBackupDate: new Date().toISOString()
     };
@@ -234,17 +237,21 @@ export class LocalDiskStorageProvider {
       warningMessage = 'Notice: 70% storage consumed on current tier.';
     }
 
+    const usedMb = used / (1024 * 1024);
+    const usedGb = used / (1024 * 1024 * 1024);
+    const usedFormatted = usedGb >= 1 ? `${usedGb.toFixed(2)} GB` : `${usedMb.toFixed(1)} MB`;
+
     return {
       usedBytes: used,
-      usedFormatted: (used / (1024 * 1024 * 1024)).toFixed(1) + ' GB',
+      usedFormatted,
       limitBytes: limit,
       limitFormatted: limit >= 1099511627776 ? 'Unlimited' : (limit / (1024 * 1024 * 1024)).toFixed(0) + ' GB',
       percentage: limit >= 1099511627776 ? 1 : percentage,
       warningLevel: limit >= 1099511627776 ? 'NORMAL' : warningLevel,
       warningMessage: limit >= 1099511627776 ? 'Unlimited Free Local Storage active.' : warningMessage,
       provider: storageSummary?.freeTierProvider || 'Cloudflare R2 / Free Tier Tier-1',
-      totalFiles: storageSummary?.totalFiles || 18420,
-      backupStatus: storageSummary?.backupStorageStatus || 'SYNCED (98.7%)',
+      totalFiles: db.collection('photos').count(),
+      backupStatus: storageSummary?.backupStorageStatus || 'SYNCED (100%)',
       lastBackupDate: storageSummary?.lastBackupDate || new Date().toISOString()
     };
   }

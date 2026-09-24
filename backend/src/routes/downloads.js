@@ -30,6 +30,27 @@ router.get('/photo/:photoId', async (req, res) => {
       ? photo.originalKey 
       : (photo.storageKey || photo.originalKey);
 
+    // Record real download event in database
+    try {
+      db.collection('downloads').insert({
+        photoId,
+        galleryId: photo.galleryId,
+        filename: targetFilename,
+        quality,
+        downloadedAt: new Date().toISOString()
+      });
+      if (photo.galleryId) {
+        const gal = db.collection('galleries').findById(photo.galleryId);
+        if (gal) {
+          db.collection('galleries').update(photo.galleryId, {
+            downloadCount: (gal.downloadCount || 0) + 1
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('Error recording download:', e);
+    }
+
     // 1. If stored on local disk
     if (key) {
       const localPath = path.resolve(__dirname, '../../../uploads', key.replace(/^\/uploads\//, ''));

@@ -27,6 +27,7 @@ import analyticsRoutes from './routes/analytics.js';
 import clientRoutes from './routes/clients.js';
 import projectRoutes from './routes/projects.js';
 import aiRoutes from './routes/ai.js';
+import inquiryRoutes from './routes/inquiries.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -66,6 +67,7 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/inquiries', inquiryRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

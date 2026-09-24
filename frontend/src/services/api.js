@@ -272,6 +272,13 @@ class ApiService {
     });
   }
 
+  submitInquiry(data) {
+    return this.request('/inquiries', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
   getProjects() {
     return this.request('/projects');
   }

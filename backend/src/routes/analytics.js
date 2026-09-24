@@ -15,13 +15,13 @@ router.get('/overview', (req, res) => {
 
   res.json({
     metrics: {
-      galleries: Math.max(24, galleriesCount),
-      photos: 18420 + photosCount,
-      clients: Math.max(31, clientsCount),
+      galleries: galleriesCount,
+      photos: photosCount,
+      clients: clientsCount,
       storageUsedPercent: storage.percentage,
       storageUsedFormatted: storage.usedFormatted,
       storageLimitFormatted: storage.limitFormatted,
-      downloads: 12842,
+      downloads: db.collection('downloads').count(),
       activeProjects: db.collection('projects').count()
     },
     storageWarning: {

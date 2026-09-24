@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, ArrowRight, Lock, Mail } from 'lucide-react';
+import { Shield, ArrowRight, Lock, Mail, Eye, EyeOff, KeyRound } from 'lucide-react';
 import { GlassNavbar } from '../components/glass/GlassNavbar';
 import { GlassCard, GlassButton } from '../components/glass/GlassCard';
 import { useAuth } from '../context/AuthContext';
 
 export function AdminLogin() {
-  const [email, setEmail] = useState('marvan@signaturebymarvan.com');
-  const [password, setPassword] = useState('signature2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,6 +17,11 @@ export function AdminLogin() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter your studio email and password');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -27,6 +33,11 @@ export function AdminLogin() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFillDemo = () => {
+    setEmail('marvankp847@gmail.com');
+    setPassword('signature2026');
   };
 
   return (
@@ -88,7 +99,7 @@ export function AdminLogin() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
+          <form onSubmit={handleLogin} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'left' }}>
             <div>
               <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
                 Email Address
@@ -98,6 +109,8 @@ export function AdminLogin() {
                 <input
                   type="email"
                   required
+                  autoComplete="username"
+                  placeholder="name@signaturebymarvan.com"
                   className="glass-input"
                   style={{ paddingLeft: '40px' }}
                   value={email}
@@ -113,13 +126,33 @@ export function AdminLogin() {
               <div style={{ position: 'relative' }}>
                 <Lock size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)' }} />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="current-password"
+                  placeholder="Enter studio password"
                   className="glass-input"
-                  style={{ paddingLeft: '40px' }}
+                  style={{ paddingLeft: '40px', paddingRight: '40px' }}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '4px'
+                  }}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
@@ -134,8 +167,25 @@ export function AdminLogin() {
             </GlassButton>
           </form>
 
-          <div style={{ marginTop: '24px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Default Studio Master: <code>marvan@signaturebymarvan.com</code>
+          <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+            <button
+              type="button"
+              onClick={handleFillDemo}
+              style={{
+                background: 'rgba(255,255,255,0.04)',
+                border: '1px solid rgba(201, 168, 106, 0.25)',
+                color: 'var(--gold-soft)',
+                padding: '6px 14px',
+                borderRadius: '9999px',
+                fontSize: '0.75rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <KeyRound size={13} /> Fill Demo Studio Credentials
+            </button>
           </div>
         </GlassCard>
       </div>

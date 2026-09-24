@@ -75,7 +75,7 @@ Thank you for trusting Signature by Marvan to preserve your sacred memories.
 Photographs are protected under copyright.
 
 Support & Album Inquiries:
-Email: marvan@signaturebymarvan.com
+Email: marvankp847@gmail.com
 Web: https://signaturebymarvan.com
 =====================================================
     `;

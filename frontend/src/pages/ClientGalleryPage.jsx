@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
   Heart,
   CheckCircle,
@@ -15,7 +15,10 @@ import {
   Camera,
   Calendar,
   MapPin,
-  Clock
+  Clock,
+  AlertCircle,
+  ArrowRight,
+  RefreshCw
 } from 'lucide-react';
 import { GlassNavbar } from '../components/glass/GlassNavbar';
 import { GlassPhotoCard, GlassAlbumCard } from '../components/glass/GlassPhotoCard';
@@ -25,14 +28,20 @@ import { SelectionSubmitModal } from '../components/client/SelectionSubmitModal'
 import { QrShareModal } from '../components/common/QrShareModal';
 import { CinematicSlideshow } from '../components/slideshow/CinematicSlideshow';
 import { DigitalAlbumBook } from '../components/album/DigitalAlbumBook';
-import { GlassButton } from '../components/glass/GlassCard';
+import { GlassCard, GlassButton } from '../components/glass/GlassCard';
 import { api } from '../services/api';
 
 export function ClientGalleryPage() {
-  const { slug } = useParams();
-  const galleryIdentifier = slug || 'arjun-anjali-x82k';
+  const { slug, code } = useParams();
+  const navigate = useNavigate();
+  const galleryIdentifier = slug || code || 'arjun-anjali-x82k';
 
   const [gallery, setGallery] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [availableGalleries, setAvailableGalleries] = useState([]);
+  const [searchCodeInput, setSearchCodeInput] = useState('');
+
   const [albums, setAlbums] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [activeTab, setActiveTab] = useState('GALLERY'); // GALLERY | ALBUMS | FAVORITES | SELECTIONS | VIDEOS
@@ -54,16 +63,18 @@ export function ClientGalleryPage() {
 
   // Load gallery data
   const loadGalleryData = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const g = await api.getGallery(galleryIdentifier);
       setGallery(g);
 
       const [albs, pts, favs, sel, vids] = await Promise.all([
-        api.getAlbums(g.id),
-        api.getPhotos(g.id),
-        api.getFavorites(g.id),
-        api.getSelection(g.id),
-        api.getVideos(g.id)
+        api.getAlbums(g.id).catch(() => []),
+        api.getPhotos(g.id).catch(() => []),
+        api.getFavorites(g.id).catch(() => ({ photoIds: [] })),
+        api.getSelection(g.id).catch(() => null),
+        api.getVideos(g.id).catch(() => [])
       ]);
 
       setAlbums(albs);
@@ -73,6 +84,12 @@ export function ClientGalleryPage() {
       setVideos(vids);
     } catch (err) {
       console.error('Error loading gallery details:', err);
+      setError(err.message || 'Gallery not found. Please verify the URL or link.');
+      api.getGalleries()
+        .then(gals => setAvailableGalleries(gals || []))
+        .catch(() => {});
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -144,10 +161,128 @@ export function ClientGalleryPage() {
     }
   };
 
-  if (!gallery) {
+  if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--bg-pitch)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        Loading your private wedding gallery...
+      <div style={{ minHeight: '100vh', background: 'var(--bg-pitch)', color: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+        <GlassNavbar />
+        <RefreshCw size={36} color="var(--gold-soft)" className="spin" style={{ animation: 'spin 1.5s linear infinite' }} />
+        <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.4rem', color: 'var(--gold-champagne)', letterSpacing: '0.04em' }}>
+          SIGNATURE BY MARVAN
+        </div>
+        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+          Retrieving private wedding collection...
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !gallery) {
+    return (
+      <div style={{ minHeight: '100vh', background: 'var(--bg-pitch)', color: '#fff', position: 'relative' }}>
+        <GlassNavbar />
+        <div style={{ maxWidth: '780px', margin: '0 auto', padding: '140px 24px 80px 24px', textAlign: 'center' }}>
+          <GlassCard
+            elevated
+            style={{
+              padding: '48px 36px',
+              borderRadius: '28px',
+              border: '1px solid rgba(201, 168, 106, 0.35)',
+              boxShadow: '0 30px 80px rgba(0,0,0,0.85)'
+            }}
+          >
+            <div
+              style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: 'rgba(245, 108, 108, 0.15)',
+                border: '1px solid rgba(245, 108, 108, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#F56C6C',
+                margin: '0 auto 20px auto'
+              }}
+            >
+              <AlertCircle size={28} />
+            </div>
+
+            <span style={{ fontSize: '0.74rem', letterSpacing: '0.24em', color: 'var(--gold-soft)', textTransform: 'uppercase', fontWeight: 600 }}>
+              VERIFY URL OR GALLERY LINK
+            </span>
+
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.4rem', color: '#fff', marginTop: '6px', marginBottom: '12px' }}>
+              Gallery Not Found
+            </h2>
+
+            <p style={{ fontSize: '0.92rem', color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: '580px', margin: '0 auto 28px auto' }}>
+              We couldn't locate a private gallery matching link or code <code style={{ color: 'var(--gold-soft)', background: 'rgba(255,255,255,0.06)', padding: '2px 8px', borderRadius: '6px' }}>{galleryIdentifier}</code>. Please double-check your invitation link or enter your code below.
+            </p>
+
+            {/* Quick Code / Slug Input Form */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (searchCodeInput.trim()) {
+                  navigate(`/gallery/${searchCodeInput.trim()}`);
+                }
+              }}
+              style={{ display: 'flex', gap: '10px', maxWidth: '480px', margin: '0 auto 32px auto' }}
+            >
+              <input
+                type="text"
+                className="glass-input"
+                placeholder="Enter gallery code or slug (e.g. X82K9P)..."
+                value={searchCodeInput}
+                onChange={(e) => setSearchCodeInput(e.target.value)}
+                style={{ flex: 1 }}
+              />
+              <GlassButton variant="gold" type="submit" icon={ArrowRight}>
+                OPEN
+              </GlassButton>
+            </form>
+
+            {/* Demo / Active Galleries helper */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '24px', textAlign: 'left' }}>
+              <div style={{ fontSize: '0.78rem', color: 'var(--gold-soft)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '12px', textAlign: 'center' }}>
+                AVAILABLE FEATURED GALLERIES
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center' }}>
+                <Link
+                  to="/gallery/arjun-anjali-x82k"
+                  style={{
+                    padding: '10px 16px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(201,168,106,0.3)',
+                    color: '#fff',
+                    fontSize: '0.85rem',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <Lock size={14} color="var(--gold-soft)" /> Arjun & Anjali (Code: X82K9P)
+                </Link>
+                <Link
+                  to="/gallery"
+                  style={{
+                    padding: '10px 16px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'var(--text-secondary)',
+                    fontSize: '0.85rem',
+                    textDecoration: 'none'
+                  }}
+                >
+                  Client Portal Login
+                </Link>
+              </div>
+            </div>
+          </GlassCard>
+        </div>
       </div>
     );
   }

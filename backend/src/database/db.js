@@ -150,12 +150,12 @@ export function seedInitialData() {
     db.collection('users').insert({
       id: 'usr_marvan_01',
       name: 'Marvan K.P.',
-      email: 'marvan@signaturebymarvan.com',
+      email: 'marvankp847@gmail.com',
       passwordHash: 'signature2026', // Verified via mock/bcrypt comparator
       role: 'OWNER',
       bio: 'Principal Photographer & Visual Artist. Crafting emotional, cinematic wedding stories across Kerala and beyond.',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-      phone: '+91 98765 43210'
+      phone: '+91 75919 42952'
     });
 
     db.collection('users').insert({

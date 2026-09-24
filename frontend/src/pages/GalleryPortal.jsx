@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, ArrowRight, KeyRound, Sparkles } from 'lucide-react';
+import { Lock, ArrowRight, KeyRound, Sparkles, Eye, EyeOff } from 'lucide-react';
 import { GlassNavbar } from '../components/glass/GlassNavbar';
 import { GlassCard, GlassButton } from '../components/glass/GlassCard';
 import { useAuth } from '../context/AuthContext';
 
 export function GalleryPortal() {
-  const [galleryCode, setGalleryCode] = useState('arjun-anjali-x82k');
-  const [pin, setPin] = useState('2026');
+  const [galleryCode, setGalleryCode] = useState('');
+  const [pin, setPin] = useState('');
+  const [showPin, setShowPin] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -32,6 +33,11 @@ export function GalleryPortal() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFillDemo = () => {
+    setGalleryCode('arjun-anjali-x82k');
+    setPin('2026');
   };
 
   return (
@@ -117,7 +123,7 @@ export function GalleryPortal() {
             </div>
           )}
 
-          <form onSubmit={handleEnterGallery} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <form onSubmit={handleEnterGallery} autoComplete="off" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ textAlign: 'left' }}>
               <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 Gallery Name or Code
@@ -125,8 +131,9 @@ export function GalleryPortal() {
               <input
                 type="text"
                 required
+                autoComplete="off"
                 className="glass-input"
-                placeholder="e.g. arjun-anjali-x82k"
+                placeholder="e.g. arjun-anjali-x82k or X82K9P"
                 value={galleryCode}
                 onChange={(e) => setGalleryCode(e.target.value)}
               />
@@ -136,16 +143,37 @@ export function GalleryPortal() {
               <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                 4-Digit Gallery PIN
               </label>
-              <input
-                type="password"
-                maxLength={8}
-                required
-                className="glass-input"
-                placeholder="• • • •"
-                style={{ textAlign: 'center', letterSpacing: '0.3em', fontSize: '1.2rem', fontFamily: 'monospace' }}
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showPin ? 'text' : 'password'}
+                  maxLength={8}
+                  required
+                  autoComplete="current-password"
+                  className="glass-input"
+                  placeholder="• • • •"
+                  style={{ textAlign: 'center', letterSpacing: '0.3em', fontSize: '1.2rem', fontFamily: 'monospace', paddingRight: '40px' }}
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPin(!showPin)}
+                  style={{
+                    position: 'absolute',
+                    right: '12px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-muted)',
+                    cursor: 'pointer',
+                    padding: '4px'
+                  }}
+                  title={showPin ? 'Hide PIN' : 'Show PIN'}
+                >
+                  {showPin ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
 
             <GlassButton
@@ -163,18 +191,36 @@ export function GalleryPortal() {
           <div
             style={{
               marginTop: '28px',
-              padding: '12px',
-              borderRadius: '12px',
+              padding: '14px',
+              borderRadius: '16px',
               background: 'rgba(255,255,255,0.03)',
               border: '1px solid rgba(255,255,255,0.06)',
-              fontSize: '0.75rem',
+              fontSize: '0.78rem',
               color: 'var(--text-secondary)'
             }}
           >
-            <div style={{ color: 'var(--gold-soft)', fontWeight: 600, marginBottom: '2px' }}>
-              Demo Wedding Credentials
+            <div style={{ color: 'var(--gold-soft)', fontWeight: 600, marginBottom: '6px' }}>
+              Demo Client Wedding Access
             </div>
-            <div>Code: <code>arjun-anjali-x82k</code> • PIN: <code>2026</code></div>
+            <button
+              type="button"
+              onClick={handleFillDemo}
+              style={{
+                background: 'rgba(201, 168, 106, 0.15)',
+                border: '1px solid rgba(201, 168, 106, 0.35)',
+                color: 'var(--gold-soft)',
+                padding: '6px 14px',
+                borderRadius: '9999px',
+                fontSize: '0.74rem',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                marginTop: '4px'
+              }}
+            >
+              <KeyRound size={13} /> Click to Fill Demo (arjun-anjali-x82k / PIN 2026)
+            </button>
           </div>
         </GlassCard>
       </div>

@@ -19,9 +19,13 @@ router.get('/', (req, res) => {
       galleryCode: g.galleryCode,
       eventDate: g.eventDate,
       location: g.location,
-      coverImage: g.coverImage,
-      totalPhotos: g.photoCountDisplay || g.totalPhotos,
+      totalPhotos: db.collection('photos').count(p => p.galleryId === g.id),
       status: g.status
+    }));
+  } else {
+    galleries = galleries.map(g => ({
+      ...g,
+      totalPhotos: db.collection('photos').count(p => p.galleryId === g.id)
     }));
   }
 
@@ -31,12 +35,16 @@ router.get('/', (req, res) => {
 // Get single gallery by ID, Slug, or GalleryCode
 router.get('/:identifier', (req, res) => {
   const { identifier } = req.params;
+  const cleanId = decodeURIComponent(identifier || '').trim().toLowerCase();
+
   const gallery = db.collection('galleries').findOne(g => 
-    g.id === identifier || g.slug === identifier || g.galleryCode === identifier
+    (g.id && g.id.toLowerCase() === cleanId) ||
+    (g.slug && g.slug.toLowerCase() === cleanId) ||
+    (g.galleryCode && g.galleryCode.toLowerCase() === cleanId)
   );
 
   if (!gallery) {
-    return res.status(404).json({ error: 'Gallery not found' });
+    return res.status(404).json({ error: 'Gallery not found. Please verify the URL or link.' });
   }
 
   // Count live stats
@@ -49,7 +57,7 @@ router.get('/:identifier', (req, res) => {
 
   res.json({
     ...gallery,
-    totalPhotos: gallery.photoCountDisplay || photosCount,
+    totalPhotos: photosCount,
     livePhotoCount: photosCount,
     favoritesCount,
     albumsCount: albums.length,

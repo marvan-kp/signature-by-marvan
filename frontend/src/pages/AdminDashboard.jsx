@@ -18,7 +18,14 @@ import {
   FolderPlus,
   Check,
   X,
-  FileCheck
+  FileCheck,
+  Inbox,
+  Edit,
+  Trash2,
+  UserPlus,
+  RefreshCcw,
+  Mail,
+  Phone
 } from 'lucide-react';
 import { GlassNavbar } from '../components/glass/GlassNavbar';
 import { GlassCard, GlassStatCard, GlassButton } from '../components/glass/GlassCard';
@@ -37,12 +44,19 @@ export function AdminDashboard() {
   const [galleries, setGalleries] = useState([]);
   const [clients, setClients] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [inquiries, setInquiries] = useState([]);
   const [storage, setStorage] = useState(null);
   const [aiSuggestions, setAiSuggestions] = useState(null);
-  const [activeTab, setActiveTab] = useState('OVERVIEW'); // OVERVIEW | GALLERIES | UPLOADER | SELECTIONS | PROJECTS | CRM | AI | STORAGE
+  const [activeTab, setActiveTab] = useState('OVERVIEW'); // OVERVIEW | GALLERIES | UPLOADER | SELECTIONS | INQUIRIES | PROJECTS | CRM | AI | STORAGE
+
+  const [selectedGalleryForUpload, setSelectedGalleryForUpload] = useState('');
 
   // Modals
   const [newGalleryModal, setNewGalleryModal] = useState(false);
+  const [editGalleryModal, setEditGalleryModal] = useState(false);
+  const [targetGalleryToEdit, setTargetGalleryToEdit] = useState(null);
+
+  const [newClientModal, setNewClientModal] = useState(false);
   const [newAlbumModal, setNewAlbumModal] = useState(false);
   const [targetGalleryForAlbum, setTargetGalleryForAlbum] = useState(null);
   const [newAlbumTitle, setNewAlbumTitle] = useState('');
@@ -56,30 +70,58 @@ export function AdminDashboard() {
     title: '',
     subtitle: '',
     location: 'Kannur, Kerala',
-    eventDate: '2026-03-15',
+    eventDate: new Date().toISOString().split('T')[0],
     pin: '2026',
     selectionLimit: 100,
     coverImage: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1600&q=80'
   });
 
+  // Edit Gallery Form
+  const [editGalleryData, setEditGalleryData] = useState({
+    title: '',
+    subtitle: '',
+    location: '',
+    eventDate: '',
+    pin: '',
+    selectionLimit: 100,
+    coverImage: ''
+  });
+
+  // New Client Form
+  const [newClientData, setNewClientData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    weddingDate: new Date().toISOString().split('T')[0],
+    location: 'Kerala, India',
+    notes: ''
+  });
+
   const loadDashboardData = async () => {
     try {
-      const [anly, gals, cls, prjs, stg] = await Promise.all([
-        api.getAnalytics(),
-        api.getGalleries(),
-        api.getClients(),
-        api.getProjects(),
-        api.getStorageUsage()
+      const [anly, gals, cls, prjs, stg, inqs] = await Promise.all([
+        api.getAnalytics().catch(() => null),
+        api.getGalleries().catch(() => []),
+        api.getClients().catch(() => []),
+        api.getProjects().catch(() => []),
+        api.getStorageUsage().catch(() => null),
+        api.request('/inquiries').catch(() => [])
       ]);
 
       setAnalytics(anly);
-      setGalleries(gals);
-      setClients(cls);
-      setProjects(prjs);
+      setGalleries(gals || []);
+      setClients(cls || []);
+      setProjects(prjs || []);
       setStorage(stg);
+      setInquiries(inqs || []);
+
+      if (gals && gals.length > 0 && !selectedGalleryForUpload) {
+        setSelectedGalleryForUpload(gals[0].id);
+      }
 
       // AI Suggestions for primary gallery
-      api.getAiAnalysis('gal_arjun_anjali')
+      const primaryId = (gals && gals[0]?.id) || 'gal_arjun_anjali';
+      api.getAiAnalysis(primaryId)
         .then(res => setAiSuggestions(res?.suggestions))
         .catch(() => {});
     } catch (err) {
@@ -94,13 +136,75 @@ export function AdminDashboard() {
   const handleCreateGallery = async (e) => {
     e.preventDefault();
     try {
-      await api.createGallery(newGalleryData);
+      const created = await api.createGallery(newGalleryData);
       setNewGalleryModal(false);
       loadDashboardData();
-      setActionMessage('New wedding gallery initialized successfully!');
+      if (created?.id) setSelectedGalleryForUpload(created.id);
+      setActionMessage(`New wedding gallery "${newGalleryData.title}" created successfully!`);
       setTimeout(() => setActionMessage(''), 3000);
     } catch (err) {
       alert('Could not create gallery: ' + err.message);
+    }
+  };
+
+  const handleOpenEditGallery = (gal) => {
+    setTargetGalleryToEdit(gal);
+    setEditGalleryData({
+      title: gal.title || '',
+      subtitle: gal.subtitle || '',
+      location: gal.location || 'Kannur, Kerala',
+      eventDate: gal.eventDate || '',
+      pin: gal.pin || '2026',
+      selectionLimit: gal.selectionLimit || 100,
+      coverImage: gal.coverImage || ''
+    });
+    setEditGalleryModal(true);
+  };
+
+  const handleUpdateGallery = async (e) => {
+    e.preventDefault();
+    if (!targetGalleryToEdit) return;
+    try {
+      await api.updateGallery(targetGalleryToEdit.id, editGalleryData);
+      setEditGalleryModal(false);
+      loadDashboardData();
+      setActionMessage(`Gallery "${editGalleryData.title}" settings updated!`);
+      setTimeout(() => setActionMessage(''), 3000);
+    } catch (err) {
+      alert('Could not update gallery: ' + err.message);
+    }
+  };
+
+  const handleCreateClient = async (e) => {
+    e.preventDefault();
+    try {
+      await api.createClient(newClientData);
+      setNewClientModal(false);
+      setNewClientData({
+        name: '',
+        email: '',
+        phone: '',
+        weddingDate: new Date().toISOString().split('T')[0],
+        location: 'Kerala, India',
+        notes: ''
+      });
+      loadDashboardData();
+      setActionMessage('New client added to directory!');
+      setTimeout(() => setActionMessage(''), 3000);
+    } catch (err) {
+      alert('Could not add client: ' + err.message);
+    }
+  };
+
+  const handleClearSampleData = async () => {
+    if (!window.confirm('Are you sure you want to clear all demo sample galleries & clients? This will reset the platform to 100% clean production mode ready for your real client photos.')) return;
+    try {
+      await api.clearSampleData();
+      loadDashboardData();
+      setActionMessage('Demo sample data cleared! Platform is now 100% ready for real original client photos.');
+      setTimeout(() => setActionMessage(''), 4000);
+    } catch (err) {
+      alert('Could not clear sample data: ' + err.message);
     }
   };
 
@@ -233,18 +337,19 @@ export function AdminDashboard() {
 
             <GlassButton
               variant="default"
-              onClick={() => setActiveTab('SELECTIONS')}
-              icon={FileCheck}
+              onClick={() => setActiveTab('INQUIRIES')}
+              icon={Inbox}
             >
-              VIEW SELECTIONS
+              INQUIRIES ({inquiries.length})
             </GlassButton>
 
             <GlassButton
-              variant="outline-gold"
-              onClick={() => setActiveTab('STORAGE')}
-              icon={HardDrive}
+              variant="subtle"
+              onClick={handleClearSampleData}
+              icon={Trash2}
+              title="Clear sample demo data to switch to 100% real production mode"
             >
-              STORAGE & DATA
+              CLEAR DEMO DATA
             </GlassButton>
 
             <button
@@ -293,32 +398,32 @@ export function AdminDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '36px' }}>
           <GlassStatCard
             title="Galleries"
-            value={analytics?.metrics?.galleries || 24}
+            value={analytics?.metrics?.galleries ?? galleries.length}
             subtitle="Active client galleries"
             icon={Camera}
           />
           <GlassStatCard
             title="Photographs"
-            value={(analytics?.metrics?.photos || 18420).toLocaleString()}
+            value={(analytics?.metrics?.photos ?? 0).toLocaleString()}
             subtitle="Preserved in storage"
             icon={Layers}
           />
           <GlassStatCard
             title="Clients"
-            value={analytics?.metrics?.clients || 31}
+            value={analytics?.metrics?.clients ?? clients.length}
             subtitle="Engaged couples"
             icon={Users}
           />
           <GlassStatCard
             title="Free Tier Storage"
-            value={`${analytics?.metrics?.storageUsedPercent || 72}%`}
-            subtitle={`${storage?.usedFormatted || '14.4 GB'} / 20 GB used`}
+            value={`${analytics?.metrics?.storageUsedPercent ?? 0}%`}
+            subtitle={`${storage?.usedFormatted || '0 MB'} / ${storage?.limitFormatted || '20 GB'} used`}
             icon={HardDrive}
             alertLevel={analytics?.storageWarning?.level}
           />
           <GlassStatCard
             title="Downloads"
-            value={(analytics?.metrics?.downloads || 12842).toLocaleString()}
+            value={(analytics?.metrics?.downloads ?? 0).toLocaleString()}
             subtitle="ZIP packages delivered"
             icon={Download}
           />
@@ -337,12 +442,13 @@ export function AdminDashboard() {
         >
           {[
             { id: 'OVERVIEW', label: 'Studio Overview' },
-            { id: 'GALLERIES', label: 'All Galleries' },
-            { id: 'STORAGE', label: 'Storage & Free Quota' },
+            { id: 'GALLERIES', label: `All Galleries (${galleries.length})` },
             { id: 'UPLOADER', label: 'Upload Engine' },
             { id: 'SELECTIONS', label: 'Pending Selections' },
+            { id: 'INQUIRIES', label: `Inquiries (${inquiries.length})` },
             { id: 'PROJECTS', label: 'Project Pipeline' },
-            { id: 'CRM', label: 'Clients CRM' },
+            { id: 'CRM', label: `Clients CRM (${clients.length})` },
+            { id: 'STORAGE', label: 'Storage & Data' },
             { id: 'AI', label: 'AI Quality Assistant' }
           ].map((tab) => (
             <button
@@ -512,6 +618,13 @@ export function AdminDashboard() {
                         VIEW AS CLIENT
                       </Link>
                       <button
+                        onClick={() => handleOpenEditGallery(gal)}
+                        className="glass-btn"
+                        style={{ fontSize: '0.76rem' }}
+                      >
+                        <Edit size={13} /> EDIT
+                      </button>
+                      <button
                         onClick={() => {
                           setTargetGalleryForAlbum(gal);
                           setNewAlbumModal(true);
@@ -522,7 +635,10 @@ export function AdminDashboard() {
                         + ALBUM
                       </button>
                       <button
-                        onClick={() => setActiveTab('UPLOADER')}
+                        onClick={() => {
+                          setSelectedGalleryForUpload(gal.id);
+                          setActiveTab('UPLOADER');
+                        }}
                         className="glass-btn"
                         style={{ fontSize: '0.76rem' }}
                       >
@@ -562,16 +678,49 @@ export function AdminDashboard() {
         {/* TAB: UPLOAD ENGINE */}
         {activeTab === 'UPLOADER' && (
           <div>
-            <div style={{ marginBottom: '20px' }}>
-              <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', color: '#fff' }}>
-                Studio Batch Upload Engine
-              </h3>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                Target: {galleries[0]?.title || 'Arjun & Anjali'} • Fast-parallel processing with Sharp
-              </p>
+            <div style={{ marginBottom: '24px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', color: '#fff' }}>
+                  Studio Batch Upload Engine
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Fast-parallel multi-stream processing with watermark overlay
+                </p>
+              </div>
+
+              {/* Target Gallery Selector */}
+              {galleries.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <label style={{ fontSize: '0.78rem', color: 'var(--gold-soft)', textTransform: 'uppercase', fontWeight: 600 }}>
+                    Select Target Gallery:
+                  </label>
+                  <select
+                    value={selectedGalleryForUpload || galleries[0]?.id || ''}
+                    onChange={(e) => setSelectedGalleryForUpload(e.target.value)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '12px',
+                      background: '#0D0D0F',
+                      border: '1px solid var(--gold-champagne)',
+                      color: '#fff',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {galleries.map((g) => (
+                      <option key={g.id} value={g.id}>
+                        {g.title} (Code: {g.galleryCode || g.slug})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
+
             <AdminUploader
-              galleryId={galleries[0]?.id || 'gal_arjun_anjali'}
+              galleryId={selectedGalleryForUpload || galleries[0]?.id || 'gal_arjun_anjali'}
               onUploadComplete={() => {
                 loadDashboardData();
                 setActionMessage('Batch upload processed and cataloged!');
@@ -587,60 +736,153 @@ export function AdminDashboard() {
             <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#fff', marginBottom: '20px' }}>
               Client Album Selections
             </h3>
-            {analytics?.pendingSelections?.map((sel) => (
-              <div
-                key={sel.id}
-                style={{
-                  padding: '20px',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '16px',
-                  marginBottom: '16px'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.2rem', color: '#fff', fontFamily: 'var(--font-serif)' }}>
-                      {sel.clientName}
-                    </h4>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--gold-soft)' }}>
-                      {sel.totalCount} Photos Selected (Limit: {sel.maxLimit}) • Status: {sel.status}
-                    </span>
-                    {sel.clientNotes && (
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '8px', fontStyle: 'italic' }}>
-                        Client notes: "{sel.clientNotes}"
-                      </p>
-                    )}
-                  </div>
+            {analytics?.pendingSelections?.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)', padding: '40px 0', textAlign: 'center' }}>
+                No pending album selections. All client selections are up to date!
+              </div>
+            ) : (
+              analytics?.pendingSelections?.map((sel) => (
+                <div
+                  key={sel.id}
+                  style={{
+                    padding: '20px',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '16px',
+                    marginBottom: '16px'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                    <div>
+                      <h4 style={{ fontSize: '1.2rem', color: '#fff', fontFamily: 'var(--font-serif)' }}>
+                        {sel.clientName}
+                      </h4>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--gold-soft)' }}>
+                        {sel.totalCount} Photos Selected (Limit: {sel.maxLimit}) • Status: {sel.status}
+                      </span>
+                      {sel.clientNotes && (
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '8px', fontStyle: 'italic' }}>
+                          Client notes: "{sel.clientNotes}"
+                        </p>
+                      )}
+                    </div>
 
-                  <div style={{ display: 'flex', gap: '10px' }}>
-                    <GlassButton
-                      variant="gold"
-                      size="sm"
-                      onClick={() => handleApproveSelection(sel.id)}
-                      icon={Check}
-                    >
-                      APPROVE
-                    </GlassButton>
-                    <GlassButton
-                      variant="subtle"
-                      size="sm"
-                      onClick={() => handleRequestChanges(sel.id)}
-                      icon={X}
-                    >
-                      REQUEST CHANGES
-                    </GlassButton>
-                    <Link
-                      to={`/gallery/${sel.galleryId}`}
-                      className="glass-btn"
-                      style={{ fontSize: '0.78rem', textDecoration: 'none' }}
-                    >
-                      VIEW IN GALLERY
-                    </Link>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <GlassButton
+                        variant="gold"
+                        size="sm"
+                        onClick={() => handleApproveSelection(sel.id)}
+                        icon={Check}
+                      >
+                        APPROVE
+                      </GlassButton>
+                      <GlassButton
+                        variant="subtle"
+                        size="sm"
+                        onClick={() => handleRequestChanges(sel.id)}
+                        icon={X}
+                      >
+                        REQUEST CHANGES
+                      </GlassButton>
+                      <Link
+                        to={`/gallery/${sel.galleryId}`}
+                        className="glass-btn"
+                        style={{ fontSize: '0.78rem', textDecoration: 'none' }}
+                      >
+                        VIEW IN GALLERY
+                      </Link>
+                    </div>
                   </div>
                 </div>
+              ))
+            )}
+          </GlassCard>
+        )}
+
+        {/* TAB: LIVE INQUIRIES & LEADS */}
+        {activeTab === 'INQUIRIES' && (
+          <GlassCard style={{ padding: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.8rem', color: '#fff' }}>
+                  Live Client Wedding Inquiries
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Submitted via website contact page and routed to marvankp847@gmail.com
+                </p>
               </div>
-            ))}
+            </div>
+
+            {inquiries.length === 0 ? (
+              <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--text-muted)' }}>
+                No website inquiries logged yet. Test by submitting a note on the Contact page!
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {inquiries.map((inq) => (
+                  <div
+                    key={inq.id}
+                    style={{
+                      padding: '20px',
+                      borderRadius: '16px',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(201, 168, 106, 0.25)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '10px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                      <div>
+                        <h4 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.3rem', color: '#fff' }}>
+                          {inq.name}
+                        </h4>
+                        <div style={{ fontSize: '0.8rem', color: 'var(--gold-soft)', marginTop: '2px' }}>
+                          Wedding Date: <strong>{inq.weddingDate || 'TBD'}</strong> • Venue: {inq.venue || 'Kerala'}
+                        </div>
+                      </div>
+                      <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                        Received {new Date(inq.createdAt || Date.now()).toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '20px', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Mail size={14} color="var(--gold-champagne)" /> {inq.email}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Phone size={14} color="var(--gold-champagne)" /> {inq.phone}
+                      </span>
+                    </div>
+
+                    {inq.message && (
+                      <div style={{ fontSize: '0.85rem', color: '#ddd', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '10px', marginTop: '4px' }}>
+                        "{inq.message}"
+                      </div>
+                    )}
+
+                    <div style={{ display: 'flex', gap: '10px', marginTop: '6px' }}>
+                      <a
+                        href={`https://api.whatsapp.com/send?phone=${inq.phone?.replace(/[^0-9]/g, '')}&text=${encodeURIComponent(`Hello ${inq.name}, Thank you for reaching out to Signature by Marvan!`)}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="glass-btn glass-btn-gold"
+                        style={{ textDecoration: 'none', fontSize: '0.76rem' }}
+                      >
+                        REPLY VIA WHATSAPP
+                      </a>
+                      <a
+                        href={`mailto:${inq.email}?subject=${encodeURIComponent(`Signature by Marvan Wedding Availability — ${inq.name}`)}`}
+                        className="glass-btn"
+                        style={{ textDecoration: 'none', fontSize: '0.76rem' }}
+                      >
+                        REPLY VIA EMAIL
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </GlassCard>
         )}
 
@@ -709,9 +951,20 @@ export function AdminDashboard() {
         {/* TAB: CLIENTS CRM */}
         {activeTab === 'CRM' && (
           <GlassCard style={{ padding: '32px' }}>
-            <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#fff', marginBottom: '20px' }}>
-              Studio Client Directory
-            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <div>
+                <h3 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', color: '#fff' }}>
+                  Studio Client Directory
+                </h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  Manage registered couples and project contacts.
+                </p>
+              </div>
+              <GlassButton variant="gold" onClick={() => setNewClientModal(true)} icon={UserPlus}>
+                ADD CLIENT
+              </GlassButton>
+            </div>
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
               {clients.map((c) => (
                 <div
@@ -907,6 +1160,176 @@ export function AdminDashboard() {
             </GlassButton>
             <GlassButton type="submit" variant="gold" style={{ flex: 1.5 }}>
               CREATE GALLERY
+            </GlassButton>
+          </div>
+        </form>
+      </GlassModal>
+
+      {/* Edit Gallery Settings Modal */}
+      <GlassModal isOpen={editGalleryModal} onClose={() => setEditGalleryModal(false)} title={`EDIT SETTINGS: ${targetGalleryToEdit?.title || ''}`}>
+        <form onSubmit={handleUpdateGallery} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Gallery Title *
+            </label>
+            <input
+              type="text"
+              required
+              className="glass-input"
+              value={editGalleryData.title}
+              onChange={(e) => setEditGalleryData({ ...editGalleryData, title: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+                Wedding Date
+              </label>
+              <input
+                type="date"
+                className="glass-input"
+                value={editGalleryData.eventDate}
+                onChange={(e) => setEditGalleryData({ ...editGalleryData, eventDate: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+                4-Digit Gallery PIN *
+              </label>
+              <input
+                type="text"
+                required
+                className="glass-input"
+                value={editGalleryData.pin}
+                onChange={(e) => setEditGalleryData({ ...editGalleryData, pin: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Location & Venue
+            </label>
+            <input
+              type="text"
+              className="glass-input"
+              value={editGalleryData.location}
+              onChange={(e) => setEditGalleryData({ ...editGalleryData, location: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Selection Limit (Max Photos Client Can Pick)
+            </label>
+            <input
+              type="number"
+              className="glass-input"
+              value={editGalleryData.selectionLimit}
+              onChange={(e) => setEditGalleryData({ ...editGalleryData, selectionLimit: Number(e.target.value) })}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Cover Image URL / Storage Path
+            </label>
+            <input
+              type="text"
+              className="glass-input"
+              value={editGalleryData.coverImage}
+              onChange={(e) => setEditGalleryData({ ...editGalleryData, coverImage: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+            <GlassButton variant="subtle" onClick={() => setEditGalleryModal(false)} style={{ flex: 1 }}>
+              CANCEL
+            </GlassButton>
+            <GlassButton type="submit" variant="gold" style={{ flex: 1.5 }}>
+              UPDATE SETTINGS
+            </GlassButton>
+          </div>
+        </form>
+      </GlassModal>
+
+      {/* New Client Modal */}
+      <GlassModal isOpen={newClientModal} onClose={() => setNewClientModal(false)} title="ADD NEW CLIENT TO DIRECTORY">
+        <form onSubmit={handleCreateClient} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div>
+            <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Couple Name *
+            </label>
+            <input
+              type="text"
+              required
+              placeholder="e.g. Fahad & Farhana"
+              className="glass-input"
+              value={newClientData.name}
+              onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div>
+              <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+                Email Address *
+              </label>
+              <input
+                type="email"
+                required
+                className="glass-input"
+                value={newClientData.email}
+                onChange={(e) => setNewClientData({ ...newClientData, email: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+                Phone Number
+              </label>
+              <input
+                type="text"
+                className="glass-input"
+                placeholder="+91 75919..."
+                value={newClientData.phone}
+                onChange={(e) => setNewClientData({ ...newClientData, phone: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Wedding Date
+            </label>
+            <input
+              type="date"
+              className="glass-input"
+              value={newClientData.weddingDate}
+              onChange={(e) => setNewClientData({ ...newClientData, weddingDate: e.target.value })}
+            />
+          </div>
+
+          <div>
+            <label style={{ fontSize: '0.74rem', color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Notes & Preferences
+            </label>
+            <textarea
+              rows={3}
+              className="glass-input"
+              value={newClientData.notes}
+              onChange={(e) => setNewClientData({ ...newClientData, notes: e.target.value })}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
+            <GlassButton variant="subtle" onClick={() => setNewClientModal(false)} style={{ flex: 1 }}>
+              CANCEL
+            </GlassButton>
+            <GlassButton type="submit" variant="gold" style={{ flex: 1.5 }}>
+              ADD CLIENT
             </GlassButton>
           </div>
         </form>
